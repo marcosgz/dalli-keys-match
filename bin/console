@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'dalli/keys_match'
+require 'irb'
+
+IRB.start(__FILE__)
