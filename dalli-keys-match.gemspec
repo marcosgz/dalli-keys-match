@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Dalli::KeysMatch::VERSION
   spec.authors       = ['Marcos G. Zimmermann']
   spec.email         = ['marcos@marcosz.com.br']
-  s.license          = 'MIT'
+  spec.license       = 'MIT'
 
   spec.summary       = %q{Dalli::KeysMatch extends Dalli with functions to deal with keys}
   spec.description   = %q{Dalli::KeysMatch extends Dalli with a function that allow you to list or remove keys using optional filters}
@@ -24,6 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'net-telnet', '~> 0.1.1'
   spec.add_runtime_dependency 'dalli', '>= 1.0.0'
   spec.add_development_dependency 'bundler', '~> 1.15'
-  spec.add_development_dependency 'rake', '~> 12.1.0'
+  spec.add_development_dependency 'rake', '~> 12.1', '>= 12.1.0'
   spec.add_development_dependency 'rspec', '~> 3.6'
 end
