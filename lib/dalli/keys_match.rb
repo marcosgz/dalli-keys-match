@@ -19,14 +19,11 @@ module Dalli
         [].tap do |keys|
           telnet.cmd("String" => "stats cachedump #{id} #{size}").split("\n").each do |line|
             if /ITEM (.+) \[\d+ b; \d+ s\]/ =~ line
-              case pattern.class.name
-              when 'NilClass'
+              if pattern.nil?
                 keys << $1
-              when 'Regexp'
+              else
                 cache_key = $1
                 keys << cache_key if cache_key =~ pattern
-              else
-                keys << $1 if $1[pattern.to_s]
               end
             end
           end
@@ -38,6 +35,8 @@ module Dalli
         @telnet.close
         @telnet = nil
       end
+
+      protected
 
       def telnet
         @telnet ||= begin
@@ -51,7 +50,8 @@ module Dalli
     end
 
     module Client
-      def keys(pattern = nil)
+      def keys_with_namespace(pattern = nil)
+        re = stats_pattern_regexp(pattern)
         result = []
         ring.servers.each do |server|
           next unless server.alive?
@@ -61,11 +61,17 @@ module Dalli
             r
           end
           slabs.each do |id, size|
-            result.push(*server.stats_cachedump(id, size, pattern))
+            result.push(*server.stats_cachedump(id, size, re))
           end
           server.close_telnet!
         end
         result
+      end
+
+      def keys(pattern = nil)
+        keys_with_namespace(pattern).map do |key|
+          key_without_namespace(key)
+        end
       end
 
       def delete_matched(pattern)
@@ -73,6 +79,29 @@ module Dalli
 
         matches = keys(pattern)
         matches.map { |k| delete(k) }.select { |r| r }.size
+      end
+
+      protected
+
+      def stats_pattern_regexp(pattern)
+        return if namespace.nil? && pattern.nil?
+
+        if namespace
+          if pattern.is_a?(Regexp)
+            opts, source = pattern.to_s.scan(/^\(\?([a-z\-]{3,4})\:(.*)\)$/m).flatten
+            source_with_namespace = \
+              if source.sub!(/^\^/,'')
+                "^#{namespace}:#{source}"
+              else
+                "^#{namespace}:.*#{source}"
+              end
+            Regexp.new("(?#{opts}:#{source_with_namespace})")
+          else
+            Regexp.new("#{namespace}:.*#{pattern}")
+          end
+        else
+          Regexp.new(pattern.to_s)
+        end
       end
     end
   end

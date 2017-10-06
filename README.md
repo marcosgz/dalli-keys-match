@@ -25,11 +25,8 @@ Or install it yourself as:
 require 'dalli/keys_match'
 
 > client = Dalli::Client.new('localhost:11211')
- => #<Dalli::Client:0x007fcb14afe830 @servers=["localhost:11211"], @options={}, @ring=nil>
 > client.set('dalli-keys-match-1' , 1)
- => 10163216984091656192
->  client.set('dalli-keys-match-2' , 2)
- => 10235274578129584128
+> client.set('dalli-keys-match-2' , 2)
 > client.keys(/dalli-keys-match-\d/)
  => ["dalli-keys-match-2", "dalli-keys-match-1"]
 > client.keys('dalli-keys-match-')
@@ -39,6 +36,25 @@ require 'dalli/keys_match'
 > client.keys(/dalli-keys-match-\d/)
  => ["dalli-keys-match-2"]
 ```
+
+Gem also handles namespaces. Keys are normalized and filters are always optimized to only look into the namespace
+```
+> dc1 = Dalli::Client.new('localhost:11211')
+> dc2 = Dalli::Client.new('localhost:11211', namespace: 'marcosgz')
+> dc1.set('zimmermann', 'last-name')
+> dc2.set('zimmermann', 'last-name')
+> dc1.keys(/zimmermann/)
+ => ["zimmermann", "marcosgz:zimmermann"]
+> dc2.keys(/zimmermann/)
+ => ["zimmermann"]
+> dc2.keys_with_namespace(/zimmermann/)
+ => ["marcosgz:zimmermann"]
+> dc2.delete_matched(/^zimmermann/)
+ => 1
+> dc1.keys(/zimmermann/)
+ => ["zimmermann"]
+```
+
 
 ### Optional Configuration
 ```
