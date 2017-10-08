@@ -2,7 +2,7 @@
 
 This gem add to the [Dalli::Client](https://github.com/petergoldstein/dalli) methods to list/filter/delete keys using regexp or string patterns.
 
-IMPORTANT: It's not recommended to use in production. Memcached binary protocol does not implement `stats cachedump` command. We are using telnet as workaround. And I recommend using it in the development environment or background jobs.
+Memcached binary protocol does not implement `stats cachedump` command. This package is using telnet as workaround. It may not be performatic in an environment with high data volume. So It's not recommend using it in production. Useful for debugging or in background jobs.
 
 ## Installation
 
