@@ -58,10 +58,10 @@ Gem also handles namespaces. Keys are normalized and filters are always optimize
 
 ### Optional Configuration
 ```
-Dalli::KeysMatch.config.telnet = {
+Dalli::KeysMatch.config.telnet(
   'Timeout' => 30,
   'Prompt' => /(^END$)/,
-}
+)
 ```
 
 ## Contributing
